@@ -14,6 +14,8 @@ import com.nmpc.kindergarten.model.User;
 import com.nmpc.kindergarten.repository.AttendanceRepository;
 import com.nmpc.kindergarten.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AttendanceService {
 
@@ -68,6 +70,38 @@ public class AttendanceService {
 
 		return dtoList;
 
+	}
+	
+	public List<AttendanceDTO> updateAttendance(List<AttendanceDTO> updationAttendanceList,LocalDate date){
+		
+		List<AttendanceDTO> updatedAttendanceList=new ArrayList<>();
+		
+		for(AttendanceDTO attendance:updationAttendanceList) {
+			Attendance dbSavedAttendance=attendanceRepository.findByPlayCenterIdAndDate(attendance.getPlayCenterId(), date);
+			dbSavedAttendance.setPresent(attendance.isPresent());
+			
+			Attendance updatedAttendance=attendanceRepository.save(dbSavedAttendance);
+			
+			User user=updatedAttendance.getUser();
+			
+			AttendanceDTO attendanceDTO=new AttendanceDTO.Builder()
+														.date(updatedAttendance.getDate())
+														.playCenterId(updatedAttendance.getPlayCenterId())
+														.present(updatedAttendance.isPresent())
+														.firstName(user.getFirstName())
+														.build();
+			updatedAttendanceList.add(attendanceDTO);
+		}
+		
+		return updatedAttendanceList;
+		
+	}
+	
+	@Transactional
+	public void deleteAllAttendance(List<AttendanceDTO> attendanceList,LocalDate date) {
+		for(AttendanceDTO attendance:attendanceList) {
+			attendanceRepository.deleteByPlayCenterIdAndDate(attendance.getPlayCenterId(), date);
+		}
 	}
 
 }
