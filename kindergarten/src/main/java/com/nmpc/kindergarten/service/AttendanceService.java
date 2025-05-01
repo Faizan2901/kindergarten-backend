@@ -26,24 +26,20 @@ public class AttendanceService {
 	private UserRepository userRepository;
 
 	public List<AttendanceDTO> saveAttendance(List<Attendance> attendanceList) {
-	    List<AttendanceDTO> savedAttendanceList = new ArrayList<>();
+		List<AttendanceDTO> savedAttendanceList = new ArrayList<>();
 
-	    for (Attendance attendance : attendanceList) {
-	       
-	        User user = userRepository.findByPlayCenterId(attendance.getPlayCenterId()).orElseThrow(() -> new RuntimeException("User not found"));
+		for (Attendance attendance : attendanceList) {
 
-	        attendance.setUser(user); 
+			User user = userRepository.findByPlayCenterId(attendance.getPlayCenterId())
+					.orElseThrow(() -> new RuntimeException("User not found"));
 
-	       
-	        Attendance dbSavedAttendance = attendanceRepository.save(attendance);
+			attendance.setUser(user);
 
-	        
-	        AttendanceDTO builderAttendance = new AttendanceDTO.Builder()
-	                .playCenterId(dbSavedAttendance.getPlayCenterId())
-	                .date(dbSavedAttendance.getDate())
-	                .present(dbSavedAttendance.isPresent())
-	                .firstName(user.getFirstName())
-	                .build();
+			Attendance dbSavedAttendance = attendanceRepository.save(attendance);
+
+			AttendanceDTO builderAttendance = new AttendanceDTO.Builder()
+					.playCenterId(dbSavedAttendance.getPlayCenterId()).date(dbSavedAttendance.getDate())
+					.present(dbSavedAttendance.isPresent()).firstName(user.getFirstName()).build();
 
 			savedAttendanceList.add(builderAttendance);
 		}
@@ -57,51 +53,61 @@ public class AttendanceService {
 		List<AttendanceDTO> dtoList = new ArrayList<>();
 
 		for (Attendance attendance : attendanceList) {
-			User user=attendance.getUser();
-		    AttendanceDTO dto = new AttendanceDTO.Builder()
-		            .playCenterId(attendance.getPlayCenterId())
-		            .date(attendance.getDate())
-		            .present(attendance.isPresent())
-		            .firstName(user.getFirstName())
-		            .build();
+			User user = attendance.getUser();
+			AttendanceDTO dto = new AttendanceDTO.Builder().playCenterId(attendance.getPlayCenterId())
+					.date(attendance.getDate()).present(attendance.isPresent()).firstName(user.getFirstName()).build();
 
-		    dtoList.add(dto);
+			dtoList.add(dto);
 		}
 
 		return dtoList;
 
 	}
-	
-	public List<AttendanceDTO> updateAttendance(List<AttendanceDTO> updationAttendanceList,LocalDate date){
-		
-		List<AttendanceDTO> updatedAttendanceList=new ArrayList<>();
-		
-		for(AttendanceDTO attendance:updationAttendanceList) {
-			Attendance dbSavedAttendance=attendanceRepository.findByPlayCenterIdAndDate(attendance.getPlayCenterId(), date);
+
+	public List<AttendanceDTO> updateAttendance(List<AttendanceDTO> updationAttendanceList, LocalDate date) {
+
+		List<AttendanceDTO> updatedAttendanceList = new ArrayList<>();
+
+		for (AttendanceDTO attendance : updationAttendanceList) {
+			Attendance dbSavedAttendance = attendanceRepository.findByPlayCenterIdAndDate(attendance.getPlayCenterId(),
+					date);
 			dbSavedAttendance.setPresent(attendance.isPresent());
-			
-			Attendance updatedAttendance=attendanceRepository.save(dbSavedAttendance);
-			
-			User user=updatedAttendance.getUser();
-			
-			AttendanceDTO attendanceDTO=new AttendanceDTO.Builder()
-														.date(updatedAttendance.getDate())
-														.playCenterId(updatedAttendance.getPlayCenterId())
-														.present(updatedAttendance.isPresent())
-														.firstName(user.getFirstName())
-														.build();
+
+			Attendance updatedAttendance = attendanceRepository.save(dbSavedAttendance);
+
+			User user = updatedAttendance.getUser();
+
+			AttendanceDTO attendanceDTO = new AttendanceDTO.Builder().date(updatedAttendance.getDate())
+					.playCenterId(updatedAttendance.getPlayCenterId()).present(updatedAttendance.isPresent())
+					.firstName(user.getFirstName()).build();
 			updatedAttendanceList.add(attendanceDTO);
 		}
-		
+
 		return updatedAttendanceList;
-		
+
 	}
-	
+
 	@Transactional
-	public void deleteAllAttendance(List<AttendanceDTO> attendanceList,LocalDate date) {
-		for(AttendanceDTO attendance:attendanceList) {
+	public void deleteAllAttendance(List<AttendanceDTO> attendanceList, LocalDate date) {
+		for (AttendanceDTO attendance : attendanceList) {
 			attendanceRepository.deleteByPlayCenterIdAndDate(attendance.getPlayCenterId(), date);
 		}
 	}
 
+	public List<LocalDate> getAllAttendanceDates() {
+		return attendanceRepository.findAllMarkedDates();
+	}
+
+	public boolean isAnyAttendanceChange(List<AttendanceDTO> updationAttendanceList, LocalDate date) {
+
+		for (AttendanceDTO attendance : updationAttendanceList) {
+			Attendance dbSavedAttendance = attendanceRepository.findByPlayCenterIdAndDate(attendance.getPlayCenterId(),
+					date);
+			if (dbSavedAttendance.isPresent() != attendance.isPresent()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

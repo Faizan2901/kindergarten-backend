@@ -72,10 +72,10 @@ public class Attendance {
 		this.playCenterId = playCenterId;
 	}
 
-
 	@Override
 	public String toString() {
-		return "Attendance [id=" + id + ", playCenterId=" + playCenterId + ", date=" + date + ", user=" + user + ", present=" + present + "]";
+		return "Attendance [id=" + id + ", playCenterId=" + playCenterId + ", date=" + date + ", user=" + user
+				+ ", present=" + present + "]";
 	}
 
 }

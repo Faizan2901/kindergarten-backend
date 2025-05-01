@@ -1,14 +1,12 @@
 package com.nmpc.kindergarten.controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,14 +35,6 @@ public class AttendanceController {
 
 		Map<String, List<AttendanceDTO>> response = new HashMap<>();
 
-//		List<AttendanceDTO> isPresentDateAttendance = attendanceService
-//				.getAttendanceByDate(attendanceData.get(0).getDate());
-//		System.out.println(isPresentDateAttendance.get(0));
-//		if (!isPresentDateAttendance.isEmpty()) {
-//			response.put("alreadyPresentAttendance", isPresentDateAttendance);
-//			return ResponseEntity.status(HttpStatus.OK).body(response);
-//		}
-
 		List<AttendanceDTO> savedAttendanceList = attendanceService.saveAttendance(attendanceData);
 
 		response.put("savedAttendance", savedAttendanceList);
@@ -72,10 +62,15 @@ public class AttendanceController {
 	@PutMapping("/update")
 	public ResponseEntity<Map<String, List<AttendanceDTO>>> updateAttendance(
 			@RequestBody List<AttendanceDTO> updationAttendance, @RequestParam("date") String date) {
-		LocalDate updationDate=LocalDate.parse(date);
+		LocalDate updationDate = LocalDate.parse(date);
 		Map<String, List<AttendanceDTO>> response = new HashMap<>();
-		boolean isOnePresent=updationAttendance.stream().anyMatch(attendance->attendance.isPresent());
-		if(!isOnePresent) {
+
+		if (!attendanceService.isAnyAttendanceChange(updationAttendance, updationDate)) {
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+
+		boolean isOnePresent = updationAttendance.stream().anyMatch(attendance -> attendance.isPresent());
+		if (!isOnePresent) {
 			attendanceService.deleteAllAttendance(updationAttendance, updationDate);
 			response.put("atLeastOnePresent", updationAttendance);
 			return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -84,6 +79,11 @@ public class AttendanceController {
 				updationDate);
 		response.put("attendanceUpdated", updatedAttendanceList);
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+	}
+
+	@GetMapping
+	public List<LocalDate> getAllAttendanceDates() {
+		return attendanceService.getAllAttendanceDates();
 	}
 
 }
