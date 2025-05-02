@@ -1,7 +1,9 @@
 package com.nmpc.kindergarten.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +45,25 @@ public class UserService {
 		}
 
 		return studentsDtoList;
+	}
+
+	public void updateStudentInfo(String firstName, String email, String gender, String dateOfBirth,
+			String address, String contactNumber, String fatherName, String motherName, String playCeneterId) {
+
+		User dbUser = userRepository.findByPlayCenterId(playCeneterId).get();
+		
+		dbUser.setFirstName(firstName);
+		dbUser.setFatherName(fatherName);
+		dbUser.setMotherName(motherName);
+		dbUser.setAddress(address);
+		dbUser.setContactNumber(contactNumber);
+		dbUser.setEmail(email);
+		dbUser.setDateOfBirth(LocalDate.parse(dateOfBirth));
+		dbUser.setGender(gender);
+		
+		userRepository.save(dbUser);
+		
+	
 	}
 
 }
