@@ -90,8 +90,9 @@ public class AttendanceController {
 	
 	@GetMapping("/attendance/student/{playCenterId}/monthly-stats")
 	public List<MonthlyAttendanceStatDTO> getMonthlyStats(@PathVariable("playCenterId") String playCenterId){
-		System.out.println(playCenterId);
-		return attendanceService.getMonthlyStatsForStudent(playCenterId);
+		
+		List<MonthlyAttendanceStatDTO> stats = attendanceService.getMonthlyStatsForStudent(playCenterId);
+		return null;
 	}
 
 }

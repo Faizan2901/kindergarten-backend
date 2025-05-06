@@ -3,52 +3,35 @@ package com.nmpc.kindergarten.dto;
 public class MonthlyAttendanceStatDTO {
 	
 	private String month;
-	private Integer totalDays;
-	private Integer presentDays;
-
-	private Integer absentDays;
-
-	public MonthlyAttendanceStatDTO(Builder builder) {
-		this.month=builder.month;
-		this.totalDays=builder.totalDays;
-		this.absentDays=builder.absentDays;
-		this.presentDays=builder.presentDays;
-	}
-
-
+	private int totalDays;
+	private int presentDays;
+	
+	
+	
 	public String getMonth() {
 		return month;
 	}
 	public void setMonth(String month) {
 		this.month = month;
 	}
-	public Integer getTotalDays() {
+	public int getTotalDays() {
 		return totalDays;
 	}
-	public void setTotalDays(Integer totalDays) {
+	public void setTotalDays(int totalDays) {
 		this.totalDays = totalDays;
 	}
-	public Integer getPresentDays() {
+	public int getPresentDays() {
 		return presentDays;
 	}
-	public void setPresentDays(Integer presentDays) {
+	public void setPresentDays(int presentDays) {
 		this.presentDays = presentDays;
 	}
-
-	public Integer getAbsentDays() {
-		return absentDays;
-	}
-
-	public void setAbsentDays(Integer absentDays) {
-		this.absentDays = absentDays;
-	}
+	
 
 	public static class Builder {
 		private String month;
 		private Integer totalDays;
 		private Integer presentDays;
-
-		private Integer absentDays;
 		
 		public Builder month(String month) {
 			this.month=month;
@@ -59,19 +42,10 @@ public class MonthlyAttendanceStatDTO {
 			this.totalDays=totalDays;
 			return this;
 		}
-
+		
 		public Builder presentDays(Integer presentDays) {
 			this.presentDays=presentDays;
 			return this;
-		}
-
-		public Builder absentDays(Integer absentDays) {
-			this.absentDays=absentDays;
-			return this;
-		}
-
-		public MonthlyAttendanceStatDTO build() {
-			return new MonthlyAttendanceStatDTO(this);
 		}
 		
 	}
@@ -79,11 +53,8 @@ public class MonthlyAttendanceStatDTO {
 
 	@Override
 	public String toString() {
-		return "MonthlyAttendanceStatDTO{" +
-				"month='" + month + '\'' +
-				", totalDays=" + totalDays +
-				", presentDays=" + presentDays +
-				", absentDays=" + absentDays +
-				'}';
+		return "MonthlyAttendanceStatDTO [month=" + month + ", totalDays=" + totalDays + ", presentDays=" + presentDays
+				+ "]";
 	}
+
 }
