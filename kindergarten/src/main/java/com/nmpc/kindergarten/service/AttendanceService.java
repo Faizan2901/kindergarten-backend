@@ -1,14 +1,18 @@
 package com.nmpc.kindergarten.service;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nmpc.kindergarten.dto.AttendanceDTO;
+import com.nmpc.kindergarten.dto.MonthlyAttendanceStatDTO;
 import com.nmpc.kindergarten.model.Attendance;
 import com.nmpc.kindergarten.model.User;
 import com.nmpc.kindergarten.repository.AttendanceRepository;
@@ -109,5 +113,53 @@ public class AttendanceService {
 		}
 
 		return false;
+	}
+
+	public List<MonthlyAttendanceStatDTO> getMonthlyStatsForStudent(String playCenterId) {
+
+		Map<String, Map<String, Integer>> attendanceData = new HashMap<>();
+
+		List<MonthlyAttendanceStatDTO> monthWiseStatList=new ArrayList<>();
+
+		List<Attendance> allMonthAttendanceList = attendanceRepository.findByPlayCenterId(playCenterId);
+
+		for (Attendance attendance : allMonthAttendanceList) {
+			String month = attendance.getDate().getMonth().name();
+			String year=String.valueOf(attendance.getDate().getYear());
+			String finalMonth=month+"-"+year;
+
+			boolean isPresent = attendance.isPresent();
+			Map<String, Integer> presentAbsentList = attendanceData.getOrDefault(finalMonth, new HashMap<>());
+			
+			if (isPresent) {
+				presentAbsentList.put("present", presentAbsentList.getOrDefault("present", 0) + 1);
+			} else {
+				presentAbsentList.put("absent", presentAbsentList.getOrDefault("absent", 0) + 1);
+			}
+			
+			attendanceData.put(finalMonth, presentAbsentList);
+
+		}
+
+		for(Map.Entry<String, Map<String, Integer>> map:attendanceData.entrySet()){
+			String monthName=map.getKey();
+			Map<String,Integer> daysMap=map.getValue();
+			Integer absentDays=daysMap.get("absent")!=null?daysMap.get("absent"):0;
+			Integer presentDays=daysMap.get("present")!=null?daysMap.get("present"):0;
+			Integer totalDays=absentDays+presentDays;
+			MonthlyAttendanceStatDTO statDTO=new MonthlyAttendanceStatDTO.Builder()
+					.month(monthName)
+					.absentDays(absentDays)
+					.presentDays(presentDays)
+					.totalDays(totalDays)
+					.build();
+
+			monthWiseStatList.add(statDTO);
+
+		}
+
+		System.out.println(monthWiseStatList);
+
+		return monthWiseStatList;
 	}
 }
