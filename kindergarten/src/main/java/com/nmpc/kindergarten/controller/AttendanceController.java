@@ -87,12 +87,11 @@ public class AttendanceController {
 	public List<LocalDate> getAllAttendanceDates() {
 		return attendanceService.getAllAttendanceDates();
 	}
-	
+
 	@GetMapping("/attendance/student/{playCenterId}/monthly-stats")
 	public List<MonthlyAttendanceStatDTO> getMonthlyStats(@PathVariable("playCenterId") String playCenterId){
-		
-		List<MonthlyAttendanceStatDTO> stats = attendanceService.getMonthlyStatsForStudent(playCenterId);
-		return null;
+		System.out.println(playCenterId);
+		return attendanceService.getMonthlyStatsForStudent(playCenterId);
 	}
 
 }

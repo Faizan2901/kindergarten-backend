@@ -117,26 +117,49 @@ public class AttendanceService {
 
 	public List<MonthlyAttendanceStatDTO> getMonthlyStatsForStudent(String playCenterId) {
 
-		Map<Month, Map<String, Integer>> attendanceData = new HashMap<>();
+		Map<String, Map<String, Integer>> attendanceData = new HashMap<>();
+
+		List<MonthlyAttendanceStatDTO> monthWiseStatList=new ArrayList<>();
 
 		List<Attendance> allMonthAttendanceList = attendanceRepository.findByPlayCenterId(playCenterId);
 
 		for (Attendance attendance : allMonthAttendanceList) {
-			Month month = attendance.getDate().getMonth();
+			String month = attendance.getDate().getMonth().name();
+			String year=String.valueOf(attendance.getDate().getYear());
+			String finalMonth=month+"-"+year;
+
 			boolean isPresent = attendance.isPresent();
-			Map<String, Integer> presentAbsentList = attendanceData.getOrDefault(month, new HashMap<>());
-			
+			Map<String, Integer> presentAbsentList = attendanceData.getOrDefault(finalMonth, new HashMap<>());
+
 			if (isPresent) {
 				presentAbsentList.put("present", presentAbsentList.getOrDefault("present", 0) + 1);
 			} else {
 				presentAbsentList.put("absent", presentAbsentList.getOrDefault("absent", 0) + 1);
 			}
-			
-			attendanceData.put(month, presentAbsentList);
+
+			attendanceData.put(finalMonth, presentAbsentList);
 
 		}
-		System.out.println(attendanceData);
 
-		return null;
+		for(Map.Entry<String, Map<String, Integer>> map:attendanceData.entrySet()){
+			String monthName=map.getKey();
+			Map<String,Integer> daysMap=map.getValue();
+			Integer absentDays=daysMap.get("absent")!=null?daysMap.get("absent"):0;
+			Integer presentDays=daysMap.get("present")!=null?daysMap.get("present"):0;
+			Integer totalDays=absentDays+presentDays;
+			MonthlyAttendanceStatDTO statDTO=new MonthlyAttendanceStatDTO.Builder()
+					.month(monthName)
+					.absentDays(absentDays)
+					.presentDays(presentDays)
+					.totalDays(totalDays)
+					.build();
+
+			monthWiseStatList.add(statDTO);
+
+		}
+
+		System.out.println(monthWiseStatList);
+
+		return monthWiseStatList;
 	}
 }
