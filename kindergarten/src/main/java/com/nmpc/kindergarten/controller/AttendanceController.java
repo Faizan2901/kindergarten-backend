@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nmpc.kindergarten.dto.AttendanceDTO;
+import com.nmpc.kindergarten.dto.MonthlyAttendanceStatDTO;
 import com.nmpc.kindergarten.model.Attendance;
 import com.nmpc.kindergarten.service.AttendanceService;
 
@@ -84,6 +86,13 @@ public class AttendanceController {
 	@GetMapping
 	public List<LocalDate> getAllAttendanceDates() {
 		return attendanceService.getAllAttendanceDates();
+	}
+	
+	@GetMapping("/attendance/student/{playCenterId}/monthly-stats")
+	public List<MonthlyAttendanceStatDTO> getMonthlyStats(@PathVariable("playCenterId") String playCenterId){
+		
+		List<MonthlyAttendanceStatDTO> stats = attendanceService.getMonthlyStatsForStudent(playCenterId);
+		return null;
 	}
 
 }

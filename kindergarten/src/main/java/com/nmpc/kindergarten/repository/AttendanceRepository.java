@@ -20,4 +20,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 	@Query("SELECT DISTINCT a.date FROM Attendance a")
 	List<LocalDate> findAllMarkedDates();
+	
+	List<Attendance> findByPlayCenterId(String playCenterId);
 }

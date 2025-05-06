@@ -1,14 +1,18 @@
 package com.nmpc.kindergarten.service;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nmpc.kindergarten.dto.AttendanceDTO;
+import com.nmpc.kindergarten.dto.MonthlyAttendanceStatDTO;
 import com.nmpc.kindergarten.model.Attendance;
 import com.nmpc.kindergarten.model.User;
 import com.nmpc.kindergarten.repository.AttendanceRepository;
@@ -109,5 +113,30 @@ public class AttendanceService {
 		}
 
 		return false;
+	}
+
+	public List<MonthlyAttendanceStatDTO> getMonthlyStatsForStudent(String playCenterId) {
+
+		Map<Month, Map<String, Integer>> attendanceData = new HashMap<>();
+
+		List<Attendance> allMonthAttendanceList = attendanceRepository.findByPlayCenterId(playCenterId);
+
+		for (Attendance attendance : allMonthAttendanceList) {
+			Month month = attendance.getDate().getMonth();
+			boolean isPresent = attendance.isPresent();
+			Map<String, Integer> presentAbsentList = attendanceData.getOrDefault(month, new HashMap<>());
+			
+			if (isPresent) {
+				presentAbsentList.put("present", presentAbsentList.getOrDefault("present", 0) + 1);
+			} else {
+				presentAbsentList.put("absent", presentAbsentList.getOrDefault("absent", 0) + 1);
+			}
+			
+			attendanceData.put(month, presentAbsentList);
+
+		}
+		System.out.println(attendanceData);
+
+		return null;
 	}
 }
