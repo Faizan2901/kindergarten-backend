@@ -1,0 +1,17 @@
+# Ignore Maven build output
+target/
+
+# Ignore Git-related files
+.git
+.gitignore
+
+# IDEs
+*.iml
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+
+# Logs
+*.log
