@@ -14,7 +14,7 @@ public class StudentDTO {
 	private String contactNumber;
 	private String fatherName;
 	private String motherName;
-	private String imageUrl;
+	private String photoUrl;
 
 	private StudentDTO(Builder builder) {
 		this.playCenterId = builder.playCenterId;
@@ -27,7 +27,7 @@ public class StudentDTO {
 		this.contactNumber = builder.contactNumber;
 		this.fatherName = builder.fatherName;
 		this.motherName = builder.motherName;
-		this.imageUrl = builder.imageUrl;
+		this.photoUrl = builder.photoUrl;
 	}
 
 	public static class Builder {
@@ -41,7 +41,7 @@ public class StudentDTO {
 		private String contactNumber;
 		private String fatherName;
 		private String motherName;
-		private String imageUrl;
+		private String photoUrl;
 
 		public Builder playCenterId(String playCenterId) {
 			this.playCenterId = playCenterId;
@@ -93,8 +93,8 @@ public class StudentDTO {
 			return this;
 		}
 
-		public Builder imageUrl(String imageUrl) {
-			this.imageUrl = imageUrl;
+		public Builder photoUrl(String photoUrl) {
+			this.photoUrl = photoUrl;
 			return this;
 		}
 
@@ -143,8 +143,8 @@ public class StudentDTO {
 		return motherName;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
+	public String getPhotoUrl() {
+		return photoUrl;
 	}
 
 	@Override
@@ -152,6 +152,6 @@ public class StudentDTO {
 		return "StudentDTO [playCenterId=" + playCenterId + ", firstName=" + firstName + ", email=" + email
 				+ ", password=" + password + ", gender=" + gender + ", dateOfBirth=" + dateOfBirth + ", address="
 				+ address + ", contactNumber=" + contactNumber + ", fatherName=" + fatherName + ", motherName="
-				+ motherName + ", imageUrl=" + imageUrl + "]";
+				+ motherName + ", photoUrl=" + photoUrl + "]";
 	}
 }

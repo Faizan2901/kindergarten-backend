@@ -3,8 +3,6 @@ package com.nmpc.kindergarten.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,10 +21,13 @@ public class UserService {
 	public User getUserInfo() {
 		String playCenterId = SecurityContextHolder.getContext().getAuthentication().getName();
 		User user = userRepository.findByPlayCenterId(playCenterId).get();
-
+		
 		if (user == null) {
 			throw new UserNotFoundException("User with " + playCenterId + " is not found");
 		}
+		
+		user.setPhotoUrl("http://localhost:8080/" + user.getPhotoUrl());
+		
 		return user;
 	}
 
@@ -40,18 +41,18 @@ public class UserService {
 					.firstName(user.getFirstName()).email(user.getEmail()).password(user.getPassword())
 					.gender(user.getGender()).dateOfBirth(user.getDateOfBirth()).address(user.getAddress())
 					.contactNumber(user.getContactNumber()).fatherName(user.getFatherName())
-					.motherName(user.getMotherName()).imageUrl("http://localhost:8080/" + user.getPhotoUrl()).build();
+					.motherName(user.getMotherName()).photoUrl("http://localhost:8080/" + user.getPhotoUrl()).build();
 			studentsDtoList.add(studentDTO);
 		}
 
 		return studentsDtoList;
 	}
 
-	public void updateStudentInfo(String firstName, String email, String gender, String dateOfBirth,
-			String address, String contactNumber, String fatherName, String motherName, String playCeneterId) {
+	public void updateStudentInfo(String firstName, String email, String gender, String dateOfBirth, String address,
+			String contactNumber, String fatherName, String motherName, String playCeneterId) {
 
 		User dbUser = userRepository.findByPlayCenterId(playCeneterId).get();
-		
+
 		dbUser.setFirstName(firstName);
 		dbUser.setFatherName(fatherName);
 		dbUser.setMotherName(motherName);
@@ -60,10 +61,9 @@ public class UserService {
 		dbUser.setEmail(email);
 		dbUser.setDateOfBirth(LocalDate.parse(dateOfBirth));
 		dbUser.setGender(gender);
-		
+
 		userRepository.save(dbUser);
-		
-	
+
 	}
 
 }

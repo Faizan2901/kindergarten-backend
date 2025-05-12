@@ -89,7 +89,7 @@ public class AuthService {
 
 		User saveUser = userRepository.save(newUser);
 
-		System.out.println(saveUser);
+//		System.out.println(saveUser);
 
 		return "User registered successfully!";
 	}

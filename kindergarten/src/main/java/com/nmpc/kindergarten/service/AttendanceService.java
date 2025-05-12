@@ -158,8 +158,6 @@ public class AttendanceService {
 
 		}
 
-		System.out.println(monthWiseStatList);
-
 		return monthWiseStatList;
 	}
 }
