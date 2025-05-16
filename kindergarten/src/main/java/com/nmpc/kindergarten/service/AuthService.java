@@ -7,14 +7,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,10 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.nmpc.kindergarten.exception.InvalidCredentialsException;
 import com.nmpc.kindergarten.exception.UserAlreadyPresent;
+import com.nmpc.kindergarten.model.PasswordResetToken;
 import com.nmpc.kindergarten.model.Role;
 import com.nmpc.kindergarten.model.User;
+import com.nmpc.kindergarten.repository.PasswordResetRepository;
 import com.nmpc.kindergarten.repository.RoleRepository;
 import com.nmpc.kindergarten.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AuthService {
@@ -41,6 +49,12 @@ public class AuthService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private PasswordResetRepository passwordResetRepository;
+
+	@Autowired
+	private EmailService emailService;
 
 	@Value("${upload.path}")
 	private String uploadDir;
@@ -126,6 +140,45 @@ public class AuthService {
 
 		return jwtUtility.generateToken(playCenterId);
 
+	}
+
+	public ResponseEntity<Map<String, String>> processForgotPassword(String email, String playCenterId) {
+		Optional<User> user = userRepository.findByEmailAndPlayCenterId(email, playCenterId);
+		if (user.isEmpty()) {
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "User not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		}
+
+		String token = UUID.randomUUID().toString();
+		PasswordResetToken resetToken = new PasswordResetToken(token, LocalDateTime.now().plusMinutes(30), user.get());
+		passwordResetRepository.save(resetToken);
+
+		String resetLink = "http://localhost:4200/reset-password?token=" + token;
+
+		return emailService.sendEmail(email, "Password Reset Instructions for Your NMPC Account",
+				"Click the link to reset your password: " + resetLink);
+	}
+
+	@Transactional
+	public ResponseEntity<Map<String, String>> resetPassword(String token, String newPassword) {
+		
+		Optional<PasswordResetToken> tokenObj = passwordResetRepository.findByToken(token);
+		Map<String, String> response = new HashMap<>();
+		
+		if (tokenObj.isEmpty() || tokenObj.get().getExpiryDate().isBefore(LocalDateTime.now())) {	
+			response.put("message", "Invalid or expired token");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+
+		User user = tokenObj.get().getUser();
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+		passwordResetRepository.deleteByTokenAndUser(token, user);
+
+		response.put("message", "Password reset successful, Now you can login");
+		
+		return ResponseEntity.ok(response);
 	}
 
 }

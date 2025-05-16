@@ -26,5 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	
 	@Query(value = "SELECT * FROM users  WHERE (play_center_id not like '%NMPCADMIN%' AND play_center_id not like '%NMPCSTUDENT%') ORDER BY id", nativeQuery = true)
 	List<User> findAllTeachers();
+	
+	Optional<User> findByEmailAndPlayCenterId(String email,String playCenterId);
 
 }

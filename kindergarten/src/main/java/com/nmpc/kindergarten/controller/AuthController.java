@@ -64,5 +64,21 @@ public class AuthController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	static {
+		System.out.println("Faixan");
+	}
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
+	    String email = request.get("email");
+	    String playCenterId = request.get("playCenterId");
+	    return authService.processForgotPassword(email,playCenterId);
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
+	    return authService.resetPassword(request.get("token"), request.get("password"));
+	}
 
 }
